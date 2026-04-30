@@ -1,5 +1,9 @@
 package main
 
+import (
+	"strings"
+)
+
 func buildArray(target []int, _ int) []string {
 	mx := target[len(target)-1]
 	ans := make([]string, 0)
@@ -83,6 +87,73 @@ func validateStackSequences(pushed []int, popped []int) bool {
 	return len(stack) == 0
 }
 
+// 创建了26个栈 为每个字母创建一个栈
 func calculateScore(o string) (ans int64) {
+	stack := [26][]int{}
+	for i, c := range o {
+		c -= 'a'
+		if st := stack[25-c]; len(st) > 0 {
+			ans += int64(i - st[len(st)-1])
+			stack[25-c] = st[:len(st)-1]
+		} else {
+			stack[c] = append(stack[c], i)
+		}
+	}
 	return
+}
+
+// 26栈玩法
+func clearStars(s string) string {
+	stack := [26][]int{}
+	deleted := make([]bool, len(s))
+	for i, c := range s {
+		if c == '*' {
+			for j := range 26 {
+				st := stack[j]
+				if len(st) > 0 {
+					deleted[st[len(st)-1]] = true
+					stack[j] = st[:len(st)-1]
+					break
+				}
+			}
+		} else {
+			c -= 'a'
+			stack[c] = append(stack[c], i)
+		}
+	}
+	var sb strings.Builder
+	for i, c := range s {
+		if c != '*' && !deleted[i] {
+			sb.WriteRune(c)
+		}
+	}
+	return sb.String()
+}
+
+func clearStars1(S string) string {
+	s := []byte(S)
+	stack := [26][]int{}
+	for i, c := range s {
+		if c == '*' {
+			for j := range 26 {
+				st := stack[j]
+				if len(st) > 0 {
+					pos := st[len(st)-1]
+					s[pos] = '*'
+					stack[j] = st[:len(st)-1]
+					break
+				}
+			}
+		} else {
+			c -= 'a'
+			stack[c] = append(stack[c], i)
+		}
+	}
+	var sb strings.Builder
+	for _, c := range s {
+		if c != '*' {
+			sb.WriteByte(c)
+		}
+	}
+	return sb.String()
 }
