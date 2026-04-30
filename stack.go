@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"strings"
 )
 
@@ -156,4 +157,70 @@ func clearStars1(S string) string {
 		}
 	}
 	return sb.String()
+}
+
+type CustomStack struct {
+	stack   []int
+	maxSize int
+}
+
+func Constructor2(maxSize int) CustomStack {
+	return CustomStack{
+		stack:   make([]int, 0),
+		maxSize: maxSize,
+	}
+}
+
+func (cs *CustomStack) Push(x int) {
+	if len(cs.stack) < cs.maxSize {
+		cs.stack = append(cs.stack, x)
+	}
+}
+
+func (cs *CustomStack) Pop() int {
+	if len(cs.stack) == 0 {
+		return -1
+	}
+	x := cs.stack[len(cs.stack)-1]
+	cs.stack = cs.stack[:len(cs.stack)-1]
+	return x
+}
+
+func (cs *CustomStack) Increment(k int, val int) {
+	for i := 0; i < len(cs.stack) && i < k; i++ {
+		cs.stack[i] += val
+	}
+}
+
+func exclusiveTime(n int, logs []string) []int {
+	time := make([]int, n)
+	type item struct {
+		id int
+		t  int
+	}
+	start := []item{}
+	for _, log := range logs {
+		parts := strings.Split(log, ":")
+		id, _ := strconv.Atoi(parts[0])
+		event := parts[1]
+		t, _ := strconv.Atoi(parts[2])
+		if event == "start" {
+			if len(start) > 0 {
+				prev := start[len(start)-1]
+				time[prev.id] += t - prev.t
+			}
+			start = append(start, item{id, t})
+		} else {
+			// 弹出一个元素
+			prev := start[len(start)-1]
+			start = start[:len(start)-1]
+			time[prev.id] += t - prev.t + 1
+			// 如果start中还有元素
+			if len(start) > 0 {
+				// 开始时间重新赋值
+				start[len(start)-1].t = t + 1
+			}
+		}
+	}
+	return time
 }
