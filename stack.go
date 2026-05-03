@@ -224,3 +224,135 @@ func exclusiveTime(n int, logs []string) []int {
 	}
 	return time
 }
+
+// minLength
+func minLength1(S string) int {
+	s := []byte(S)
+	stack := make([]byte, 0)
+	for i := 0; i < len(s); i++ {
+		if len(stack) > 0 {
+			top := stack[len(stack)-1]
+			if (s[i] == 'B' && top == 'A') || (s[i] == 'D' && top == 'C') {
+				stack = stack[:len(stack)-1] // pop
+				continue
+			}
+		}
+		stack = append(stack, s[i])
+	}
+	return len(stack)
+}
+
+// makeGood
+func makeGood(s string) string {
+	stack := make([]byte, 0)
+	for i := 0; i < len(s); i++ {
+		if len(stack) > 0 {
+			top := stack[len(stack)-1]
+			if top^32 == s[i] {
+				stack = stack[:len(stack)-1] // pop
+				continue
+			}
+		}
+		stack = append(stack, s[i])
+	}
+	return string(stack)
+}
+
+func resultingString(s string) string {
+	stack := make([]byte, 0)
+	for i := 0; i < len(s); i++ {
+		if len(stack) > 0 {
+			top := stack[len(stack)-1]
+			diff := abs(int(top) - int(s[i]))
+			if diff == 1 || diff == 25 {
+				stack = stack[:len(stack)-1] // pop
+				continue
+			}
+		}
+		stack = append(stack, s[i])
+	}
+	return string(stack)
+}
+
+func isValid(s string) bool {
+	stack := make([]byte, 0)
+	for i := 0; i < len(s); i++ {
+		stack = append(stack, s[i])
+		if len(stack) >= 3 && string(stack[len(stack)-3:]) == "abc" {
+			stack = stack[:len(stack)-3]
+		}
+	}
+	return len(stack) == 0
+}
+
+func minDeletion(nums []int) int {
+	var ans int
+	stack := make([]int, 0)
+	for i := 0; i < len(nums); i++ {
+		n := len(stack)
+		// 如果栈大小为偶数，可以随意加入元素
+		// 如果栈大小为奇数，那么加入的元素不能和栈顶相同
+		if n > 0 && n%2 == 1 && stack[n-1] == nums[i] {
+			stack = stack[:n-1]
+		}
+		stack = append(stack, nums[i])
+	}
+	if len(stack)%2 != 0 {
+		ans++
+	}
+	return ans + len(nums) - len(stack)
+}
+
+func removeDuplicates(s string, k int) string {
+	stack := make([]byte, 0)
+	for i := 0; i < len(s); i++ {
+		stack = append(stack, s[i])
+		// 这里每次判断前k个字符是否相同 那么这个算法时间复杂度就是(o(kn))
+		// 下边使用了计数栈来优化
+		if len(stack) >= k && sameCharacter(string(stack[len(stack)-k:])) {
+			stack = stack[:len(stack)-k]
+		}
+	}
+	return string(stack)
+}
+
+func sameCharacter(s string) bool {
+	n := len(s)
+	if n <= 1 {
+		return true
+	}
+	for i := 1; i < len(s); i++ {
+		if s[i] != s[i-1] {
+			return false
+		}
+	}
+	return true
+}
+
+// 使用了计数栈来优化 判断相同字符的操作
+func removeDuplicates1(s string, k int) string {
+	type pair struct {
+		ch  byte
+		cnt int
+	}
+	stack := []pair{}
+	for i := 0; i < len(s); i++ {
+		if len(stack) > 0 && stack[len(stack)-1].ch == s[i] {
+			stack[len(stack)-1].cnt++
+			// 如果计数已经到达k，那么就需要pop
+			if stack[len(stack)-1].cnt == k {
+				stack = stack[:len(stack)-1]
+			}
+		} else {
+			stack = append(stack, pair{s[i], 1})
+		}
+	}
+	// 拼接字符串
+	var sb strings.Builder
+	for _, p := range stack {
+		for i := 0; i < p.cnt; i++ {
+			sb.WriteByte(p.ch)
+		}
+	}
+	return sb.String()
+}

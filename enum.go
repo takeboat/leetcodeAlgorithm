@@ -691,3 +691,25 @@ func differenceOfDistinctValues2(grid [][]int) [][]int {
 	}
 	return ans
 }
+
+func minAbsoluteDifference(nums []int) int {
+	ans := math.MaxInt32
+	last1, last2 := -1, -1
+	for i := 0; i < len(nums); i++ {
+		if nums[i] == 1 {
+			if last2 != -1 {
+				ans = min(ans, abs(i-last2))
+			}
+			last1 = i
+		} else if nums[i] == 2 {
+			if last1 != -1 {
+				ans = min(ans, abs(i-last1))
+			}
+			last2 = i
+		}
+	}
+	if ans == math.MaxInt32 {
+		return -1
+	}
+	return ans
+}

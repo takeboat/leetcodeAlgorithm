@@ -3,5 +3,5 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println(clearStars("z"))
+	fmt.Println(makeGood("Pp"))
 }
