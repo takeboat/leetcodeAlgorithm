@@ -3,5 +3,5 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println(makeGood("Pp"))
+	fmt.Println(minRemoveToMakeValid("lee(t(c)o)de)"))
 }
