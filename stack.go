@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"strconv"
 	"strings"
 )
@@ -357,6 +358,7 @@ func removeDuplicates1(s string, k int) string {
 	return sb.String()
 }
 
+<<<<<<< HEAD
 func maxDepth(s string) int {
 	var ans int
 	depth := 0
@@ -422,11 +424,43 @@ func reverseParentheses1(s string) string {
 			dir = -dir
 		} else {
 			sb.WriteByte(ch)
+=======
+func mergeAdjacent(nums []int) []int64 {
+	stack := make([]int64, 0)
+	for i := 0; i < len(nums); i++ {
+		stack = append(stack, int64(nums[i]))
+		for len(stack) > 1 && stack[len(stack)-1] == stack[len(stack)-2] {
+			v := 2 * stack[len(stack)-1]
+			stack = stack[:len(stack)-2]
+			stack = append(stack, v)
+		}
+	}
+	return stack
+}
+
+func robotWithString(s string) string {
+	n := len(s)
+	sufMin := make([]byte, n+1)
+	sufMin[n] = math.MaxInt8
+	// 记录后缀最小值
+	for i := n - 1; i >= 0; i-- {
+		sufMin[i] = min(sufMin[i+1], s[i])
+	}
+	var sb strings.Builder
+	stack := make([]byte, 0)
+	// 遍历字符串s 当遇到了小于等于后缀最小值的字符时就开始弹出
+	for i, ch := range s {
+		stack = append(stack, byte(ch))
+		for len(stack) > 0 && stack[len(stack)-1] <= sufMin[i+1] {
+			sb.WriteByte(stack[len(stack)-1])
+			stack = stack[:len(stack)-1]
+>>>>>>> fee40a7 (stack)
 		}
 	}
 	return sb.String()
 }
 
+<<<<<<< HEAD
 func scoreOfParentheses(s string) int {
 	stack := []int{0} // 记录最终累加结果
 	for i := 0; i < len(s); i++ {
@@ -471,10 +505,41 @@ func minRemoveToMakeValid(S string) string {
 			continue
 		}
 		sb.WriteByte(s[i])
+=======
+func removeSubstring(s string, k int) string {
+	type pair struct {
+		ch  byte
+		cnt int
+	}
+	var sb strings.Builder
+	stack := make([]pair, 0)
+	for i := 0; i < len(s); i++ {
+		// 先添加
+		if len(stack) > 0 && stack[len(stack)-1].ch == s[i] {
+			stack[len(stack)-1].cnt++
+		} else {
+			stack = append(stack, pair{s[i], 1})
+		}
+		// 再消除
+		n := len(stack)
+		if n > 1 && stack[n-1].ch == ')' && stack[n-2].ch == '(' && stack[n-1].cnt >= k && stack[n-2].cnt >= k {
+			stack[n-2].cnt -= k
+			if stack[n-2].cnt == 0 {
+				// pop 两个
+				stack = stack[:n-2]
+			} else {
+				stack = stack[:n-1]
+			}
+		}
+	}
+	for i := range stack {
+		sb.WriteString(strings.Repeat(string(stack[i].ch), stack[i].cnt))
+>>>>>>> fee40a7 (stack)
 	}
 	return sb.String()
 }
 
+<<<<<<< HEAD
 // 简单题不要想复杂
 // 需要将最外层的括号去掉
 // 标记层数即可
@@ -588,4 +653,78 @@ func minInsertions(s string) int {
 		}
 	}
 	return ans + openCnt*2
+func maximumGain(s string, x int, y int) int {
+	mxstr, mnstr := "ab", "ba"
+	mxScore, mnScore := x, y
+	if x < y {
+		mxstr, mnstr = mnstr, mxstr
+		mxScore, mnScore = mnScore, mxScore
+	}
+	// 先按照分数最大的字符串进行匹配
+	stack := make([]byte, 0)
+	build := func(s string, substr string, score int) int {
+		var ans int
+		for i := 0; i < len(s); i++ {
+			stack = append(stack, s[i])
+			n := len(stack)
+			if n >= 2 && string(stack[n-2:]) == substr {
+				ans += score
+				stack = stack[:n-2]
+			}
+		}
+		return ans
+	}
+	s1 := build(s, mxstr, mxScore)
+	newStr := string(stack)
+	clear(stack)
+	s2 := build(newStr, mnstr, mnScore)
+	return s1 + s2
+}
+
+func maximumGain1(s string, x int, y int) int {
+	mxstr, mnstr := "ab", "ba"
+	mxScore, mnScore := x, y
+	if x < y {
+		mxstr, mnstr = mnstr, mxstr
+		mxScore, mnScore = mnScore, mxScore
+	}
+	// 先按照分数最大的字符串进行匹配
+	stack := make([]byte, 0)
+	build := func(s string, substr string, score int) int {
+		var ans int
+		for i := 0; i < len(s); i++ {
+			stack = append(stack, s[i])
+			n := len(stack)
+			if n >= 2 && string(stack[n-2:]) == substr {
+				ans += score
+				stack = stack[:n-2]
+			}
+		}
+		return ans
+	}
+	s1 := build(s, mxstr, mxScore)
+	newStr := string(stack)
+	clear(stack)
+	s2 := build(newStr, mnstr, mnScore)
+	return s1 + s2
+}
+
+func minAddToMakeValid(s string) int {
+	stack := make([]byte, 0)
+	// 存储不能够匹配的括号
+	for i := 0; i < len(s); i++ {
+		if len(stack) > 0 && stack[len(stack)-1] == '(' && s[i] == ')' {
+			stack = stack[:len(stack)-1]
+		} else {
+			stack = append(stack, s[i])
+		}
+	}
+	return len(stack)
+}
+
+func removeOuterParentheses(s string) string {
+	stack := make([]byte, 0)
+	for i := 0; i < len(s); i++ {
+	}
+	return string(stack)
 }
