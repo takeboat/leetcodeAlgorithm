@@ -376,14 +376,15 @@ func reverseParentheses(s string) string {
 	stack := []string{""}
 	// 每一层将结果返回给上一层
 	for _, ch := range s {
-		if ch == '(' {
+		switch ch {
+		case '(':
 			stack = append(stack, "")
-		} else if ch == ')' {
+		case ')':
 			top := stack[len(stack)-1]
 			stack = stack[:len(stack)-1]
 			reversed := reverseStr(top)
 			stack[len(stack)-1] += reversed
-		} else {
+		default:
 			stack[len(stack)-1] += string(ch)
 		}
 	}
@@ -400,7 +401,7 @@ func reverseStr(s string) string {
 
 func mergeAdjacent(nums []int) []int64 {
 	stack := make([]int64, 0)
-	for i := 0; i < len(nums); i++ {
+	for i := range nums {
 		stack = append(stack, int64(nums[i]))
 		for len(stack) > 1 && stack[len(stack)-1] == stack[len(stack)-2] {
 			v := 2 * stack[len(stack)-1]
@@ -530,13 +531,13 @@ func checkValidString(s string) bool {
 	// 栈消除
 	stack := make([]int, 0)
 	star := make([]int, 0)
-	for i := range s {
-		if s[i] == '(' {
+	for i, ch := range s {
+		switch ch {
+		case '(':
 			stack = append(stack, i)
-		} else if s[i] == '*' {
+		case '*':
 			star = append(star, i)
-		} else if s[i] == ')' {
-			// 这里可以匹配 * 或者 (
+		case ')':
 			if len(stack) > 0 {
 				stack = stack[:len(stack)-1]
 			} else if len(star) > 0 {
