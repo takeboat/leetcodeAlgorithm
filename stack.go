@@ -516,3 +516,76 @@ func minSwaps(s string) int {
 	}
 	return ans
 }
+
+func checkValidString(s string) bool {
+	// 栈消除
+	stack := make([]int, 0)
+	star := make([]int, 0)
+	for i := range s {
+		if s[i] == '(' {
+			stack = append(stack, i)
+		} else if s[i] == '*' {
+			star = append(star, i)
+		} else if s[i] == ')' {
+			// 这里可以匹配 * 或者 (
+			if len(stack) > 0 {
+				stack = stack[:len(stack)-1]
+			} else if len(star) > 0 {
+				star = star[:len(star)-1]
+			} else {
+				return false
+			}
+		}
+	}
+	// 这里(* 的匹配不能够匹配数量,数量是结果 不是原因, 需要看( * 的位置分布
+	// 最后匹配 ( 和 *
+	i, j := len(stack)-1, len(star)-1
+	for i >= 0 && j >= 0 {
+		if stack[i] > star[j] {
+			return false
+		}
+		i--
+		j--
+	}
+	return i == -1
+}
+
+func maxDepthAfterSplit(seq string) []int {
+	ans := make([]int, len(seq))
+	depth := 0
+	for i := range seq {
+		if seq[i] == '(' {
+			depth++
+			ans[i] = depth % 2
+		} else {
+			ans[i] = depth % 2
+			depth--
+		}
+	}
+	return ans
+}
+
+// 最小
+// 修改了平衡的概念
+// `(` 对应了 `))`
+func minInsertions(s string) int {
+	ans := 0
+	openCnt := 0
+	for i := 0; i < len(s); i++ {
+		if s[i] == '(' {
+			openCnt++
+		} else {
+			if (i+1) < len(s) && s[i+1] == ')' {
+				i++
+			} else {
+				ans++
+			}
+			if openCnt > 0 {
+				openCnt--
+			} else {
+				ans++
+			}
+		}
+	}
+	return ans + openCnt*2
+}
