@@ -358,7 +358,6 @@ func removeDuplicates1(s string, k int) string {
 	return sb.String()
 }
 
-<<<<<<< HEAD
 func maxDepth(s string) int {
 	var ans int
 	depth := 0
@@ -399,32 +398,6 @@ func reverseStr(s string) string {
 	return string(rune)
 }
 
-func reverseParentheses1(s string) string {
-	n := len(s)
-	pair := make([]int, n)
-	stack := []int{}
-	for i, ch := range s {
-		if ch == '(' {
-			stack = append(stack, i)
-		} else if ch == ')' {
-			j := stack[len(stack)-1]
-			stack = stack[:len(stack)-1]
-			pair[i] = j
-			pair[j] = i
-		}
-	}
-	// 这个操作很神奇 可以搭配记一下
-	var sb strings.Builder
-	dir := 1
-	for i := 0; i < n; i += dir {
-		ch := s[i]
-		if ch == '(' || ch == ')' {
-			// 转换方向
-			i = pair[i]
-			dir = -dir
-		} else {
-			sb.WriteByte(ch)
-=======
 func mergeAdjacent(nums []int) []int64 {
 	stack := make([]int64, 0)
 	for i := 0; i < len(nums); i++ {
@@ -454,13 +427,11 @@ func robotWithString(s string) string {
 		for len(stack) > 0 && stack[len(stack)-1] <= sufMin[i+1] {
 			sb.WriteByte(stack[len(stack)-1])
 			stack = stack[:len(stack)-1]
->>>>>>> fee40a7 (stack)
 		}
 	}
 	return sb.String()
 }
 
-<<<<<<< HEAD
 func scoreOfParentheses(s string) int {
 	stack := []int{0} // 记录最终累加结果
 	for i := 0; i < len(s); i++ {
@@ -481,31 +452,6 @@ func scoreOfParentheses(s string) int {
 	return stack[0]
 }
 
-func minRemoveToMakeValid(S string) string {
-	s := []byte(S)
-	var stack []int // 存储未匹配的括号索引
-	for i := 0; i < len(s); i++ {
-		if s[i] == '(' {
-			stack = append(stack, i)
-		} else if s[i] == ')' {
-			if len(stack) > 0 {
-				stack = stack[:len(stack)-1]
-			} else {
-				s[i] = 0 // 标记为消除
-			}
-		}
-	}
-	// stack中存储的索引标记为消除
-	for _, i := range stack {
-		s[i] = 0
-	}
-	var sb strings.Builder
-	for i := range s {
-		if s[i] == 0 {
-			continue
-		}
-		sb.WriteByte(s[i])
-=======
 func removeSubstring(s string, k int) string {
 	type pair struct {
 		ch  byte
@@ -534,12 +480,10 @@ func removeSubstring(s string, k int) string {
 	}
 	for i := range stack {
 		sb.WriteString(strings.Repeat(string(stack[i].ch), stack[i].cnt))
->>>>>>> fee40a7 (stack)
 	}
 	return sb.String()
 }
 
-<<<<<<< HEAD
 // 简单题不要想复杂
 // 需要将最外层的括号去掉
 // 标记层数即可
@@ -653,6 +597,8 @@ func minInsertions(s string) int {
 		}
 	}
 	return ans + openCnt*2
+}
+
 func maximumGain(s string, x int, y int) int {
 	mxstr, mnstr := "ab", "ba"
 	mxScore, mnScore := x, y
@@ -720,11 +666,4 @@ func minAddToMakeValid(s string) int {
 		}
 	}
 	return len(stack)
-}
-
-func removeOuterParentheses(s string) string {
-	stack := make([]byte, 0)
-	for i := 0; i < len(s); i++ {
-	}
-	return string(stack)
 }
