@@ -1,5 +1,7 @@
 package main
 
+import "math"
+
 func maxAbsoluteSum(nums []int) int {
 	n := len(nums)
 	p := make([]int, n+1) // prefixSum
@@ -72,3 +74,141 @@ func numOfSubarrays(arr []int) int {
 	}
 	return ans % mod
 }
+
+func subarraysDivByK(nums []int, k int) int {
+	var ans int
+	cnt := map[int]int{}
+	cnt[0] = 1
+	pre := 0
+	for _, num := range nums {
+		pre += num
+		mod := (pre%k + k) % k
+		if c, ok := cnt[mod]; ok {
+			ans += c
+		}
+		cnt[mod]++
+	}
+	return ans
+}
+
+func checkSubarraySum(nums []int, k int) bool {
+	if len(nums) < 2 {
+		return false
+	}
+	cnt := map[int]int{}
+	cnt[0] = -1
+	pre := 0
+	for i, num := range nums {
+		pre += num
+		mod := (pre%k + k) % k
+		if idx, ok := cnt[mod]; ok {
+			if i-idx >= 2 {
+				return true
+			}
+		} else {
+			cnt[mod] = i
+		}
+	}
+	return false
+}
+
+// 用位运算来代替那些复杂操作
+// 前缀和搭配哈希表计数
+func beautifulSubarrays(nums []int) int64 {
+	var ans int64
+	s := 0
+	cnt := map[int]int{}
+	cnt[0] = 1
+	for _, num := range nums {
+		s ^= num
+		ans += int64(cnt[s])
+		cnt[s]++
+	}
+	return ans
+}
+
+// 将0看做-1 计算nums的前缀和得到sum数组
+// 遍历sum数组，找到sum[i]=sum[j] 中max(i-j)
+func findMaxLength(nums []int) int {
+	var ans int
+	pos := map[int]int{0: -1}
+	s := 0
+	for i, num := range nums {
+		s += num*2 - 1
+		if j, ok := pos[s]; ok {
+			ans = max(ans, i-j)
+		} else {
+			pos[s] = i
+		}
+	}
+	return ans
+}
+
+// 将0看做-1 计算nums的前缀和得到sum数组
+// 遍历sum数组，找到sum[i]=sum[j]中max(i-j)
+// 将ans = s[j+1:i+1]
+func findLongestSubarray(s []string) []string {
+	var ans []string
+	pre := 0
+	pos := map[int]int{0: -1}
+	for i := 0; i < len(s); i++ {
+		r := rune(s[i][0])
+		if r >= '0' && r <= '9' {
+			pre += 1
+		} else {
+			pre -= 1
+		}
+		if j, ok := pos[pre]; ok {
+			if len(ans) < i-j {
+				ans = s[j+1 : i+1]
+			}
+		} else {
+			pos[pre] = i
+		}
+	}
+	return ans
+}
+
+// 将两个状态合二为一 (处理方法还是很厉害)
+func maxBalancedSubarray(nums []int) int {
+	var ans int
+	type pair struct{ xor, diff int }
+	pos := map[pair]int{{}: -1}
+	pre := pair{}
+	for i, num := range nums {
+		pre.xor ^= num
+		pre.diff += num%2*2 - 1
+		if j, ok := pos[pre]; ok {
+			ans = max(ans, i-j)
+		} else {
+			pos[pre] = i
+		}
+	}
+	return ans
+}
+
+func maximumSubarraySum(nums []int, k int) int64 {
+	ans := math.MinInt64
+	abs := func(x int) int {
+		if x < 0 {
+			return -x
+		}
+		return x
+	}
+	n := len(nums)
+	pre := make([]int, n+1)
+	for i, num := range nums {
+		pre[i+1] = pre[i] + num
+	}
+	for i := 0; i < n; i++ {
+		for j := i + 1; j < n; j++ {
+			if abs(nums[i]-nums[j]) == k {
+				ans = max(ans, pre[j+1]-pre[i])
+			}
+		}
+	}
+	return int64(ans)
+}
+
+// [-1,3,2,4,5] k=3
+// [0, -1, 2, 4, 8, 13]
