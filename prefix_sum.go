@@ -217,3 +217,13 @@ func maximumSubarraySum(nums []int, k int) int64 {
 	}
 	return int64(ans)
 }
+
+// [-1,3,2,4,5] k=3
+// [0, -1, 2, 4, 8, 13]
+func PrefixSum(nums []int) []int {
+	ans := make([]int, len(nums)+1)
+	for i, num := range nums {
+		ans[i+1] = ans[i] + num
+	}
+	return ans
+}

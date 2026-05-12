@@ -1,6 +1,9 @@
 package main
 
-import "math"
+import (
+	"math"
+	"sort"
+)
 
 func leftGreater(nums []int) []int {
 	n := len(nums)
@@ -142,4 +145,30 @@ func (ss *StockSpanner) Next(price int) int {
 	ans := ss.cur - ss.st[len(ss.st)-1].day
 	ss.st = append(ss.st, pair{price: price, day: ss.cur})
 	return ans
+}
+
+func carFleet(target int, position []int, speed []int) int {
+	n := len(position)
+	type car struct {
+		pos int
+		spd int
+	}
+	cars := make([]car, 0, n)
+	for i := range n {
+		cars = append(cars, car{position[i], speed[i]})
+	}
+	// 按照距离排序
+	sort.Slice(cars, func(i, j int) bool {
+		return cars[i].pos < cars[j].pos
+	})
+	fleets := 1
+	curTime := float64(target-cars[n-1].pos) / float64(cars[n-1].spd)
+	for i := n - 2; i >= 0; i-- {
+		time := float64(target-cars[i].pos) / float64(cars[i].spd)
+		if time > curTime {
+			fleets++
+			curTime = time
+		}
+	}
+	return fleets
 }
