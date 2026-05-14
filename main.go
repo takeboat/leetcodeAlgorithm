@@ -17,10 +17,6 @@ func main() {
 	fmt.Println("[3, 4, 5]: ", ans)
 	fmt.Println("pre[5]^pre[2]", pre[5]^pre[2])
 	fmt.Println("this is", pre[5]^pre[2] == ans)
-	nums := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-	ans := PrefixSum(nums)
-	fmt.Println(nums)
-	fmt.Println(ans)
 	// [1 2 3 4 5 6 7 8 9 10]
 	// [0 1 3 6 10 15 21 28 36 45 55]
 	// 计算索引 2-5 之间的和 3+4+5+6 = 18
