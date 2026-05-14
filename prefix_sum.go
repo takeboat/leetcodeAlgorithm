@@ -189,26 +189,31 @@ func maxBalancedSubarray(nums []int) int {
 
 func maximumSubarraySum(nums []int, k int) int64 {
 	ans := math.MinInt64
-	abs := func(x int) int {
-		if x < 0 {
-			return -x
-		}
-		return x
-	}
 	n := len(nums)
 	pre := make([]int, n+1)
 	for i, num := range nums {
 		pre[i+1] = pre[i] + num
 	}
-	for i := 0; i < n; i++ {
-		for j := i + 1; j < n; j++ {
-			if abs(nums[i]-nums[j]) == k {
-				ans = max(ans, pre[j+1]-pre[i])
-			}
+	// 计算前缀和
+	pos := map[int]int{}
+	for j := 0; j < n; j++ {
+		x := nums[j]
+		v1 := x - k
+		v2 := x + k
+		if i, ok := pos[v1]; ok {
+			ans = max(ans, pre[j+1]-pre[i])
 		}
+		if i, ok := pos[v2]; ok {
+			ans = max(ans, pre[j+1]-pre[i])
+		}
+		// 这里是关键, 如果没有存在这个值那么添加到map中
+		// 如果当前值的前缀和 < 之前出现的前缀和小 那么就更新
+		if old, ok := pos[x]; !ok || pre[old] > pre[j] {
+			pos[x] = j
+		}
+	}
+	if ans == math.MinInt64 {
+		return 0
 	}
 	return int64(ans)
 }
-
-// [-1,3,2,4,5] k=3
-// [0, -1, 2, 4, 8, 13]
