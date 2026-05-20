@@ -282,6 +282,13 @@ func doesValidArrayExist(derived []int) bool {
 
 func getMaximumXor(nums []int, maximumBit int) []int {
 	n := len(nums)
+	mask := 1<<maximumBit - 1
 	ans := make([]int, n)
+	for i := 1; i < n; i++ {
+		nums[i] ^= nums[i-1]
+	}
+	for i := range nums {
+		ans[n-i-1] = nums[i] ^ mask
+	}
 	return ans
 }
