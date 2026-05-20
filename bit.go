@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"math/bits"
+	"slices"
 )
 
 func smallestNumber(n int) int {
@@ -10,8 +12,7 @@ func smallestNumber(n int) int {
 	return 1<<bits.Len(uint(n)) - 1
 }
 
-// 非负整数 x 二进制的所有位都相同，意味着 x=0 或者 x 的二进制全为 1，即 x=2^k−1，其中 k 是非负整数。
-// 问题转换为统计[1-n] 中有多少个2^k
+// 非负整数 x 二进制的所有位都相同，意味着 x=0 或者 x 的二进制全为 1，即 x=2^k−1，其中 k 是非负整数。 问题转换为统计[1-n] 中有多少个2^k
 func countMonobit(n int) int {
 	return bits.Len(uint(n + 1))
 }
@@ -162,5 +163,125 @@ func findFinalValue1(nums []int, original int) int {
 }
 
 func validStrings(n int) []string {
-	return nil
+	bytes := make([]byte, n)
+	ans := make([]string, 0)
+	var dfs func(i int)
+	dfs = func(i int) {
+		if i == n { // 长度够了
+			ans = append(ans, string(bytes))
+			return
+		}
+		bytes[i] = '1'
+		dfs(i + 1)
+		if i == 0 || bytes[i-1] == '1' {
+			bytes[i] = '0'
+			dfs(i + 1)
+		}
+	}
+	dfs(0)
+	return ans
+}
+
+func validStrings1(n int) []string {
+	// 使用位运算
+	mask := 1<<n - 1 //
+	ans := make([]string, 0)
+	// 遍历可能出现的所有元素 然后校验
+	// 这里是逆向思维 判断一个数的二进制形式中是否包含相邻0 等价于 将其取反判断该数的二进制形式中是否包含相邻1
+	// i & (i>>1) != 0 的情况下说明 i 的二进制形式中包含相邻的1
+	for i := 0; i < (1 << n); i++ {
+		// 满足条件
+		if i&(i>>1) == 0 {
+			// 满足条件但是需要取反
+			ans = append(ans, fmt.Sprintf("%0*b", n, i^mask))
+		}
+	}
+	return ans
+}
+
+func minimumFlips(num int) int {
+	n := uint(num)
+	reverse := bits.Reverse(n) >> uint(bits.LeadingZeros(n))
+	return bits.OnesCount(uint(reverse ^ n))
+}
+
+func sortByReflection(nums []int) []int {
+	// 如果提前计算 那么需要计算数组的交换也需要做
+	reverse := func(n int) int {
+		// 翻转之后右移前导0的位数可以获取有效翻转位
+		return int(bits.Reverse(uint(n)) >> bits.LeadingZeros(uint(n)))
+	}
+	// sort.Slice(nums, func(i, j int) bool {
+	// 	ri, rj := reverse(nums[i]), reverse(nums[j])
+	// 	if ri != rj {
+	// 		return ri < rj
+	// 	}
+	// 	return nums[i] < nums[j]
+	// })
+	slices.SortFunc(nums, func(i, j int) int {
+		ri, rj := reverse(i), reverse(j)
+		if ri != rj {
+			return ri - rj
+		}
+		return i - j
+	})
+	return nums
+}
+
+// TODO: 系统学习BFS之后才开始这个
+// 结合位运算 查看这种解法
+func minSplitMerge(nums1 []int, nums2 []int) int {
+	return 1
+}
+
+func decode(encoded []int, first int) []int {
+	n := len(encoded)
+	ans := make([]int, n+1)
+	ans[0] = first
+	for i := range encoded {
+		ans[i+1] = ans[i] ^ encoded[i]
+	}
+	return ans
+}
+
+func findArray(pref []int) []int {
+	n := len(pref)
+	ans := make([]int, n)
+	ans[0] = pref[0]
+	for i := 1; i < n; i++ {
+		ans[i] = pref[i-1] ^ pref[i]
+	}
+	return ans
+}
+
+func longestSubsequence(nums []int) int {
+	xor := 0
+	for _, x := range nums {
+		xor ^= x
+	}
+	if xor != 0 {
+		return len(nums)
+	}
+	// 异或和为0
+	// 1.nums全是0 2.nums中元素出现的次数>2
+	for _, x := range nums {
+		if x != 0 {
+			return len(nums) - 1
+		}
+	}
+	return 0
+}
+
+func doesValidArrayExist(derived []int) bool {
+	xor := 0
+	for _, x := range derived {
+		xor ^= x
+	}
+	return xor == 0
+}
+
+func getMaximumXor(nums []int, maximumBit int) []int {
+	n := len(nums)
+	ans := make([]int, n)
+	return ans
 }
