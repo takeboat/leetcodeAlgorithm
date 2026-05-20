@@ -292,3 +292,37 @@ func getMaximumXor(nums []int, maximumBit int) []int {
 	}
 	return ans
 }
+
+// leetcode 1525
+func minOperations2(nums []int, k int) int {
+	xor := 0
+	for _, x := range nums {
+		xor ^= x
+	}
+	return bits.OnesCount(uint(k ^ xor))
+}
+
+func countTriplets(arr []int) int {
+	var ans int
+	n := len(arr)
+	// 计算前缀异或和
+	prefix := make([]int, n+1)
+	for i := range arr {
+		prefix[i+1] = prefix[i] ^ arr[i]
+	}
+	// 对于i,j,k 来说有以下
+	// preifx[i] ^ prefix[j] == prefix[k+1] ^ prefix[j]
+	// 简化得到 preifx[i] == prefix[k+1]
+	// 枚举k 如果有前缀和相同的坐标为i 那么会产生 (k-i)个三元组
+	cnt := map[int]int{}   // 记录相同前缀出现的次数  例如在当前k+1的位置中的前缀和在之前出现过3次 那么 cnt[] = 3
+	total := map[int]int{} // 记录相同前缀和的 索引和 例如 在i=1, i=3, i=5 中前缀和和当前k+1位置的前缀和一样那么total=9
+	// 知道这些值就可以算出 增量的三元组 k-i1+k-i2+k-i3 => k*cnt-sum(idx)
+	for k := range n {
+		if c, ok := cnt[prefix[k+1]]; ok {
+			ans += c*k - total[prefix[k+1]] // 这里主要是累加(k-i) 出现的所有的和
+		}
+		cnt[prefix[k]]++
+		total[prefix[k]] += k
+	}
+	return ans
+}
