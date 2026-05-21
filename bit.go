@@ -326,3 +326,120 @@ func countTriplets(arr []int) int {
 	}
 	return ans
 }
+
+func minimizeXor(num1 int, num2 int) int {
+	// 看num2和num1的差值
+	// 如果相等 返回num1
+	// 如果 num2 > num1 那么将返回num1 | diff
+	// 如果 num1 > num2
+	diff := bits.OnesCount(uint(num2)) - bits.OnesCount(uint(num1))
+	if diff == 0 {
+		return num1
+	}
+	if diff > 0 {
+		// 找到num1最低 diff位置 将最低位的0变成1
+		for i := 0; i < 32 && diff > 0; i++ {
+			if num1>>i&1 == 0 {
+				num1 |= 1 << i
+				diff--
+			}
+		}
+		return num1
+	}
+	if diff < 0 {
+		// 将最低位的1变成0
+		diff = -diff
+		cnt := bits.Len(uint(num1))
+		for i := 0; i < cnt && diff > 0; i++ {
+			if num1>>i&1 == 1 {
+				num1 ^= 1 << i
+				diff--
+			}
+		}
+	}
+	return num1
+}
+
+func minimizeXor1(num1 int, num2 int) int {
+	c1 := bits.OnesCount(uint(num1))
+	c2 := bits.OnesCount(uint(num2))
+	for ; c1 > c2; c2++ {
+		// 将最低位的1变成0
+		num1 &= num1 - 1
+	}
+	for ; c2 > c1; c1++ {
+		// 将最低位的0变成1
+		num1 |= num1 + 1
+	}
+	return num1
+}
+
+func xorBeauty(nums []int) int {
+	xor := 0
+	for _, num := range nums {
+		xor ^= num
+	}
+	return xor
+}
+
+// // maximumXOR 计算经过任意次「将某个数的某个 1 变成 0」操作后，整个数组能得到的最大异或和。
+//
+// 核心观察：
+// 1. 操作只能把 二进制位中的 1 改为 0，不能把 0 改为 1，所以 0 的位永远无法变成 1。
+// 2. 异或和等价于每个二进制位上 1 的个数的奇偶性：
+//   - 某位上有奇数个 1 → 异或和该位为 1
+//   - 某位上有偶数个 1 → 异或和该位为 0
+//     3. 对于任意一个在 nums 中出现过 1 的二进制位，我们总能通过`操作`减少一些数的该位 1（改为 0），
+//     来自由控制最后该位 1 的个数是奇数还是偶数，从而让异或结果的该位为 1。
+//     例如：如果当前该位有偶数个 1，只需将其中任意一个 1 改为 0，就变成了奇数个 1。
+//     4. 如果某一位在所有数中都没有出现过 1，那最终异或结果该位只能是 0。
+//
+// 因此，最大异或和就是所有数的 按位或（OR），即只要某个位在任意一个数中出现过 1，
+// 它就能在最终结果中为 1。
+func maximumXOR(nums []int) int {
+	res := 0
+	for _, num := range nums {
+		res |= num
+	}
+	return res
+}
+
+// 检查最后一个元素是不是全是1
+func hasTrailingZeros(nums []int) bool {
+	cnt := 0
+	for _, num := range nums {
+		if num&1 == 0 {
+			cnt++
+		}
+	}
+	return cnt >= 2
+}
+
+func minFlips(a int, b int, c int) int {
+	or := a | b
+	and := a & b
+	diff := or ^ c                                // 哪些位置需要变动
+	double := bits.OnesCount(uint(diff & and))    // 哪些位置需要更改两次
+	single := bits.OnesCount(uint(diff)) - double // 剩下的需要变动1次
+	return double*2 + single
+}
+
+// 最大元素的连续长度
+func longestSubarray(nums []int) int {
+	ans := 1
+	cnt := 1
+	mx := nums[0]
+	for i := 1; i < len(nums); i++ {
+		if nums[i] == mx {
+			cnt++
+			ans = max(ans, cnt)
+		} else if nums[i] > mx {
+			cnt = 1
+			ans = 1
+			mx = nums[i]
+		} else {
+			cnt = 0
+		}
+	}
+	return ans
+}
