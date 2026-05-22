@@ -443,3 +443,18 @@ func longestSubarray(nums []int) int {
 	}
 	return ans
 }
+
+func maxSubarrays(nums []int) int {
+	var ans int
+	and := -1 // -1 => 111111111...1
+	for _, x := range nums {
+		and &= x
+		if and == 0 {
+			ans++ // 子数组数量加1 重置and
+			and = -1
+		}
+	}
+	// 如果ans没有变动 那么就是说 数组的and运算中没有出现0
+	// 此时的答案是全部数组 数组数量为1
+	return max(ans, 1)
+}
