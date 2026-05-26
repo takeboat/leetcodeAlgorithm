@@ -1053,29 +1053,3 @@ func furthestBuilding1(heights []int, bricks int, ladders int) int {
 	}
 	return len(heights) - 1
 }
-
-type MaxIntHeap []int                    // 大根堆
-func (h MaxIntHeap) Len() int            { return len(h) }
-func (h MaxIntHeap) Less(i, j int) bool  { return h[i] > h[j] }
-func (h MaxIntHeap) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
-func (h *MaxIntHeap) Push(x interface{}) { *h = append(*h, x.(int)) }
-func (h *MaxIntHeap) Pop() interface{} {
-	old := *h
-	n := len(old)
-	x := old[n-1]
-	*h = old[:n-1]
-	return x
-}
-
-type MinIntHeap []int                    // 小根堆
-func (h MinIntHeap) Len() int            { return len(h) }
-func (h MinIntHeap) Less(i, j int) bool  { return h[i] < h[j] }
-func (h MinIntHeap) Swap(i, j int)       { h[i], h[j] = h[j], h[i] }
-func (h *MinIntHeap) Push(x interface{}) { *h = append(*h, x.(int)) }
-func (h *MinIntHeap) Pop() interface{} {
-	old := *h
-	n := len(old)
-	x := old[n-1]
-	*h = old[:n-1]
-	return x
-}

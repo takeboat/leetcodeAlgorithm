@@ -1,6 +1,7 @@
 package main
 
 import (
+	"container/list"
 	"slices"
 )
 
@@ -63,39 +64,42 @@ func (rhs *RideSharingSystem) CancelRider(riderId int) {
 	delete(rhs.waitingRider, riderId)
 }
 
+/*
 // 这里换了个概念就是用户等待队列 变为 用户取消队列
-// type RideSharingSystem struct {
-// driver       []int
-// rider        []int
-// cancled  map[int]bool
-// }
-//
-//	func (rhs *RideSharingSystem) AddRider(riderId int) {
-//		rhs.rider = append(rhs.rider, riderId)
-//		delete(rhs.cancled, riderId)
-//	}
-//
-//	func (rhs *RideSharingSystem) AddDriver(driverId int) {
-//		rhs.driver = append(rhs.driver, driverId)
-//	}
-//
-//	func (rhs *RideSharingSystem) MatchDriverWithRider() []int {
-//		for len(rhs.rider) > 0 && rhs.cancled[rhs.rider[0]] {
-//			rhs.rider = rhs.rider[1:]
-//		}
-//		if len(rhs.rider) == 0 || len(rhs.driver) == 0 {
-//			return []int{-1, -1}
-//		}
-//		rider := rhs.rider[0]
-//		driver := rhs.driver[0]
-//		rhs.rider = rhs.rider[1:]
-//		rhs.driver = rhs.driver[1:]
-//		return []int{driver, rider}
-//	}
-//
-//	func (rhs *RideSharingSystem) CancelRider(riderId int) {
-//		rhs.cancled[riderId] = true
-//	}
+
+	type RideSharingSystem struct {
+		driver       []int
+		rider        []int
+		cancled  map[int]bool
+	}
+
+	func (rhs *RideSharingSystem) AddRider(riderId int) {
+		rhs.rider = append(rhs.rider, riderId)
+		delete(rhs.cancled, riderId)
+	}
+
+	func (rhs *RideSharingSystem) AddDriver(driverId int) {
+		rhs.driver = append(rhs.driver, driverId)
+	}
+
+	func (rhs *RideSharingSystem) MatchDriverWithRider() []int {
+		for len(rhs.rider) > 0 && rhs.cancled[rhs.rider[0]] {
+			rhs.rider = rhs.rider[1:]
+		}
+		if len(rhs.rider) == 0 || len(rhs.driver) == 0 {
+			return []int{-1, -1}
+		}
+		rider := rhs.rider[0]
+		driver := rhs.driver[0]
+		rhs.rider = rhs.rider[1:]
+		rhs.driver = rhs.driver[1:]
+		return []int{driver, rider}
+	}
+
+	func (rhs *RideSharingSystem) CancelRider(riderId int) {
+		rhs.cancled[riderId] = true
+	}
+*/
 
 // o(n^2) 暴力解法
 func deckRevealedIncreasing(deck []int) []int {
@@ -160,4 +164,113 @@ func predictPartyVictory(s string) string {
 		return winner[0]
 	}
 	return winner[1]
+}
+
+type FrontMiddleBackQueue struct {
+	left  *list.List
+	right *list.List
+}
+
+// 维护两个队列 保证len(left) >= len(right) && len(left) <= len(right)+1
+func NewFrontMiddleBackQueue() FrontMiddleBackQueue {
+	return FrontMiddleBackQueue{
+		left:  list.New(),
+		right: list.New(),
+	}
+}
+
+func (q *FrontMiddleBackQueue) PushFront(val int) {
+	q.left.PushFront(val)
+	if q.left.Len() == q.right.Len()+2 {
+		back := q.left.Back().Value.(int)
+		q.left.Remove(q.left.Back())
+		q.right.PushFront(back)
+	}
+}
+
+func (q *FrontMiddleBackQueue) PushMiddle(val int) {
+	if q.left.Len() == q.right.Len()+1 {
+		q.right.PushFront(q.left.Back().Value.(int))
+		q.left.Remove(q.left.Back())
+	}
+	q.left.PushBack(val)
+}
+
+func (q *FrontMiddleBackQueue) PushBack(val int) {
+	q.right.PushBack(val)
+	if q.left.Len()+1 == q.right.Len() {
+		front := q.right.Front().Value.(int)
+		q.right.Remove(q.right.Front())
+		q.left.PushBack(front)
+	}
+}
+
+func (q *FrontMiddleBackQueue) PopFront() int {
+	if q.left.Len() == 0 {
+		return -1
+	}
+	front := q.left.Front().Value.(int)
+	q.left.Remove(q.left.Front())
+	if q.left.Len()+1 == q.right.Len() {
+		f := q.right.Front().Value.(int)
+		q.right.Remove(q.right.Front())
+		q.left.PushBack(f)
+	}
+	return front
+}
+
+func (q *FrontMiddleBackQueue) PopMiddle() int {
+	if q.left.Len() == 0 {
+		return -1
+	}
+	mid := q.left.Back().Value.(int)
+	q.left.Remove(q.left.Back())
+	if q.left.Len()+1 == q.right.Len() {
+		f := q.right.Front().Value.(int)
+		q.right.Remove(q.right.Front())
+		q.left.PushBack(f)
+	}
+	return mid
+}
+
+func (q *FrontMiddleBackQueue) PopBack() int {
+	if q.left.Len() == 0 {
+		return -1
+	}
+	if q.right.Len() == 0 {
+		back := q.left.Back().Value.(int)
+		q.left.Remove(q.left.Back())
+		return back
+	} else {
+		back := q.right.Back().Value.(int)
+		q.right.Remove(q.right.Back())
+		if q.right.Len()+2 == q.left.Len() {
+			b := q.left.Back().Value.(int)
+			q.left.Remove(q.left.Back())
+			q.right.PushFront(b)
+		}
+		return back
+	}
+}
+
+func finalString(s string) string {
+	queue := list.New()
+	tail := true
+	for _, ch := range []byte(s) {
+		if ch == 'i' {
+			tail = !tail
+		} else if tail {
+			queue.PushBack(ch)
+		} else {
+			queue.PushFront(ch)
+		}
+	}
+	ans := make([]byte, 0, len(s))
+	for i := queue.Front(); i != nil; i = i.Next() {
+		ans = append(ans, i.Value.(byte))
+	}
+	if !tail {
+		slices.Reverse(ans)
+	}
+	return string(ans)
 }
