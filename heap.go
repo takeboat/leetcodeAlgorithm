@@ -19,9 +19,11 @@ func (h *MaxIntHeap) Pop() any {
 	return v
 }
 
+// 小根堆
 type MinIntHeap struct {
 	sort.IntSlice
-} // 小根堆
+}
+
 // sort.IntSlice 这里其实不用写Less
 func (h MinIntHeap) Less(i, j int) bool { return h.IntSlice[i] < h.IntSlice[j] }
 func (h *MinIntHeap) Push(v any)        { h.IntSlice = append(h.IntSlice, v.(int)) }
@@ -138,6 +140,7 @@ func NewSmallestInfiniteSet() SmallestInfiniteSet {
 }
 
 func (s *SmallestInfiniteSet) PopSmallest() int {
+	return s.cur
 }
 
 func (s *SmallestInfiniteSet) AddBack(num int) {
