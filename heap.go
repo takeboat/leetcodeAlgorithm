@@ -301,4 +301,45 @@ func maximumProduct1(nums []int, k int) int {
 }
 
 func smallestChair(times [][]int, targetFriend int) int {
+	target := times[targetFriend][0]       // 目标朋友的到达时间
+	freeH := &MinIntHeap{sort.IntSlice{}}  // 存储空闲的座位
+	leaveH := &MinIntHeap{sort.IntSlice{}} // 存储离开时间
+	lMap := make(map[int][]int)            // 离开时间对应座位号
+	// sorted by arrival time (asc)
+	sort.Slice(times, func(i, j int) bool {
+		return times[i][0] < times[j][0]
+	})
+	nextChair := 0
+	for i := range times {
+		arr, leave := times[i][0], times[i][1]
+		// 如果arr时间大于leaveheap中的堆顶 需要将这些对应的座位回收到freeH
+		for leaveH.Len() > 0 && leaveH.IntSlice[0] <= arr {
+			chairs := lMap[leaveH.IntSlice[0]]
+			for _, chair := range chairs {
+				heap.Push(freeH, chair)
+			}
+			delete(lMap, leaveH.IntSlice[0])
+			heap.Pop(leaveH)
+		}
+		if freeH.Len() > 0 {
+			chair := heap.Pop(freeH).(int)
+			if arr == target {
+				return chair
+			}
+			heap.Push(leaveH, leave)
+			lMap[leave] = append(lMap[leave], chair)
+		} else {
+			if arr == target {
+				return nextChair
+			}
+			heap.Push(leaveH, leave)
+			lMap[leave] = append(lMap[leave], nextChair)
+			nextChair++
+		}
+	}
+	return -1
+}
+
+func getNumoerOfBacklogOrders(orders [][]int) int {
+	return 1
 }
